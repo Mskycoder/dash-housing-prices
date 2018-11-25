@@ -4,15 +4,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 from components import Column, Header, Row
-from auth import auth
+# from auth import auth
 
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from scipy.stats import norm
-from sklearn.preprocessing import StandardScaler
-from scipy import stats
 import warnings
 import plotly.graph_objs as go
 import json
@@ -27,47 +22,44 @@ app = dash.Dash(
 # username of the currently logged in user.                                                             #
 # If `REQUIRE_LOGIN = False`, then no login screen will be displayed and `auth_instance` will be `None` #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-auth_instance = auth(app)
+# auth_instance = auth(app)
 
 server = app.server  # Expose the server variable for deployments
 
 # Standard Dash app code below
-fp = open("data/data_description.json", "r")
-data_dict = json.load(fp)
-fp.close()
+# fp = open("data/data_description.json", "r")
+# data_dict = json.load(fp)
+# fp.close()
 df_train = pd.read_csv('data/train.csv')
 df = df_train.drop(columns=["Id"])
 print(df.columns)
 app.layout = html.Div(className='container', children=[
 
-    Header('Ames housing'),
-    # dcc.Tabs(id="tabs", value='1', children=[
-    #     dcc.Tab(label='Scatter plot', value='1'),
-    #     dcc.Tab(label='Box plot', value='2'),
+    Header('Housing Prices Explorer'),
+    dcc.Tabs(id="tabs", children=[
+        dcc.Tab(label='Scatter plot', children=dcc.Graph(id='scatter')),
+        dcc.Tab(label='Box plot', children=dcc.Graph(id='box')),
+    ]),
+    # Row([
+    #     Column(width=6, children=[
+    #         dcc.Graph(id='scatter')
+    #     ]),
+    #     Column(width=6, children=[
+    #         dcc.Graph(id='box')
+    #     ]),
     # ]),
     Row([
         Column(width=6, children=[
-            dcc.Graph(id='scatter')
-        ]),
-        Column(width=6, children=[
-            dcc.Graph(id='box')
-        ]),
-    ]),
-    Row([
-        Column(width=4, children='Variable'),
-        Column(width=4, children='x-axis'),
-        Column(width=4, children='y-axis'),
-    ]),
-    Row([
-        Column(width=4, children=[
+            html.Div("Variable"),
             dcc.Dropdown(
                 id = 'variable',
                 options = [{'label':el, 'value':el} for el in df.columns if (df[el].dtype.name in {'int64', 'float64'})],
                 value = 'GrLivArea'
             )
         ]),
-        Column(width=4, children=[
-            dcc.Dropdown(
+        Column(width=3, children=[
+            html.Div("x-axis"),
+            dcc.RadioItems(
                 id = 'xmode',
                 options = [
                     {'label': 'linear', 'value': 'linear'},
@@ -76,8 +68,9 @@ app.layout = html.Div(className='container', children=[
                 value = 'linear'
             )
         ]),
-        Column(width=4, children=[
-            dcc.Dropdown(
+        Column(width=3, children=[
+            html.Div("y-axis"),
+            dcc.RadioItems(
                 id = 'ymode',
                 options = [
                     {'label': 'linear', 'value': 'linear'},
@@ -109,7 +102,7 @@ def update_scatter(var, xmode, ymode):
         data = [trace],
         layout = go.Layout(
 
-            title = "{}".format(data_dict[var]),
+            title = "{}".format(var),
             xaxis = dict(
                 title = var,
                 type = xmode,
@@ -140,7 +133,7 @@ def update_box(var):
         data = [trace],
         layout = go.Layout(
 
-            title = "{}".format(data_dict[var]),
+            title = "{}".format(var),
             xaxis = dict(
                 title = var,
                 autorange = True
