@@ -15,6 +15,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy import stats
 import warnings
 import plotly.graph_objs as go
+import json
 
 app = dash.Dash(
     __name__
@@ -31,13 +32,27 @@ auth_instance = auth(app)
 server = app.server  # Expose the server variable for deployments
 
 # Standard Dash app code below
-
-df_train = pd.read_csv('train.csv')
-print(type(df_train['GrLivArea'].dtype))
+fp = open("data/data_description.json", "r")
+data_dict = json.load(fp)
+fp.close()
+df_train = pd.read_csv('data/train.csv')
+df = df_train.drop(columns=["Id"])
+print(df.columns)
 app.layout = html.Div(className='container', children=[
 
-    Header('Sample App'),
-    Row([dcc.Graph(id='scatter')]),
+    Header('Ames housing'),
+    # dcc.Tabs(id="tabs", value='1', children=[
+    #     dcc.Tab(label='Scatter plot', value='1'),
+    #     dcc.Tab(label='Box plot', value='2'),
+    # ]),
+    Row([
+        Column(width=6, children=[
+            dcc.Graph(id='scatter')
+        ]),
+        Column(width=6, children=[
+            dcc.Graph(id='box')
+        ]),
+    ]),
     Row([
         Column(width=4, children='Variable'),
         Column(width=4, children='x-axis'),
@@ -47,7 +62,7 @@ app.layout = html.Div(className='container', children=[
         Column(width=4, children=[
             dcc.Dropdown(
                 id = 'variable',
-                options = [{'label':el, 'value':el} for el in df_train.columns if (df_train[el].dtype.name in {'int64', 'float64'})],
+                options = [{'label':el, 'value':el} for el in df.columns if (df[el].dtype.name in {'int64', 'float64'})],
                 value = 'GrLivArea'
             )
         ]),
@@ -82,26 +97,19 @@ app.layout = html.Div(className='container', children=[
     [dash.dependencies.Input('variable', 'value'),
     dash.dependencies.Input('xmode', 'value'),
     dash.dependencies.Input('ymode', 'value')])
-def update_figure(var, xmode, ymode):
+def update_scatter(var, xmode, ymode):
 
-    if var == 'MSSubClass':
-
-        trace = go.Box(
-            x = df_train[var],
-            y = df_train['SalePrice']
-            )
-    else:
-        trace = go.Scatter(
-            x = df_train[var],
-            y = df_train['SalePrice'],
-            mode = 'markers'
-            )
+    trace = go.Scatter(
+        x = df[var],
+        y = df['SalePrice'],
+        mode = 'markers'
+    )
     figure = go.Figure(
 
         data = [trace],
         layout = go.Layout(
 
-            title = "Housing prices",
+            title = "{}".format(data_dict[var]),
             xaxis = dict(
                 title = var,
                 type = xmode,
@@ -110,6 +118,35 @@ def update_figure(var, xmode, ymode):
             yaxis = dict(
                 title = 'SalePrice',
                 type = ymode,
+                autorange = True
+            )
+        )
+    )
+    return figure
+
+
+@app.callback(dash.dependencies.Output('box', 'figure'),
+    [dash.dependencies.Input('variable', 'value')])
+def update_box(var):
+
+
+    trace = go.Box(
+        x = df[var],
+        y = df['SalePrice']
+    )
+
+    figure = go.Figure(
+
+        data = [trace],
+        layout = go.Layout(
+
+            title = "{}".format(data_dict[var]),
+            xaxis = dict(
+                title = var,
+                autorange = True
+            ),
+            yaxis = dict(
+                title = 'SalePrice',
                 autorange = True
             )
         )
