@@ -1,0 +1,7 @@
+dash==0.30.0
+dash-auth==1.2.0
+dash-renderer==0.15.0
+dash-core-components==0.38.0
+dash-html-components==0.13.2
+plotly
+gunicorn
