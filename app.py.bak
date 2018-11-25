@@ -1,0 +1,59 @@
+import dash_core_components as dcc
+import plotly.graph_objs as go
+import dash_html_components as html
+import dash
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from scipy.stats import norm
+from sklearn.preprocessing import StandardScaler
+from scipy import stats
+import warnings
+
+warnings.filterwarnings('ignore')
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+df_train = pd.read_csv('train.csv')
+
+
+
+app.layout = html.Div([
+    dcc.Dropdown(
+        id = 'variable',
+        options = [{'label':el, 'value':el} for el in df_train.columns],
+        value = 'GrLivArea'
+
+    ),
+    dcc.Graph(id='scatter')
+
+])
+@app.callback(dash.dependencies.Output('scatter', 'figure'),
+    [dash.dependencies.Input('variable', 'value')])
+def update_figure(var):
+    trace = go.Scatter(
+        x = df_train[var],
+        y = df_train['SalePrice'],
+        mode = 'markers'
+        )
+    figure = go.Figure(
+
+        data = [trace],
+        layout = go.Layout(
+            title = "Housing prices",
+            xaxis = dict(
+                title = var
+            ),
+            yaxis = dict(
+                title = 'SalePrice'
+            )
+
+        )
+    )
+    return figure
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
