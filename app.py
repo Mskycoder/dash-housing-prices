@@ -82,7 +82,8 @@ app.layout = html.Div(className='container', children=[
         # Column(width=8, children=[
         #     dcc.Graph(id='graph')
         # ])
-    ])
+    ]),
+    html.Div("https://github.com/Mskycoder/dash-housing-prices")
 ])
 
 
