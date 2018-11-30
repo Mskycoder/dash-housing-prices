@@ -27,9 +27,9 @@ app = dash.Dash(
 server = app.server  # Expose the server variable for deployments
 
 # Standard Dash app code below
-# fp = open("data/data_description.json", "r")
-# data_dict = json.load(fp)
-# fp.close()
+fp = open("data/data_description.json", "r")
+data_dict = json.load(fp)
+fp.close()
 df_train = pd.read_csv('data/train.csv')
 df = df_train.drop(columns=["Id"])
 print(df.columns)
@@ -103,7 +103,7 @@ def update_scatter(var, xmode, ymode):
         data = [trace],
         layout = go.Layout(
 
-            title = "{}".format(var),
+            title = "{}".format(data_dict[var]),
             xaxis = dict(
                 title = var,
                 type = xmode,
@@ -134,7 +134,7 @@ def update_box(var):
         data = [trace],
         layout = go.Layout(
 
-            title = "{}".format(var),
+            title = "{}".format(data_dict[var]),
             xaxis = dict(
                 title = var,
                 autorange = True
