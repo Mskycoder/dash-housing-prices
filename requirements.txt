@@ -5,3 +5,6 @@ dash-core-components==0.38.0
 dash-html-components==0.13.2
 plotly
 gunicorn
+pandas==0.23.0
+numpy==1.14.3
+scipy==1.1.0
