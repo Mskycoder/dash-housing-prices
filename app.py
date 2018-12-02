@@ -32,7 +32,7 @@ data_dict = json.load(fp)
 fp.close()
 df_train = pd.read_csv('data/train.csv')
 df = df_train.drop(columns=["Id"])
-print(df.columns)
+# print(df.columns)
 app.layout = html.Div(className='container', children=[
 
     Header('Housing Prices Explorer'),
