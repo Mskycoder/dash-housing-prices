@@ -1,10 +1,10 @@
-dash==0.30.0
+dash==0.31.1
 dash-auth==1.2.0
 dash-renderer==0.15.0
-dash-core-components==0.38.0
+dash-core-components==0.40.0
 dash-html-components==0.13.2
 plotly
 gunicorn
-pandas==0.23.0
-numpy==1.14.3
+pandas==0.23.4
+numpy==1.15.4
 scipy==1.1.0
